@@ -20,7 +20,7 @@ def train_epoch(model, dataloader, optimizer, logging=None, interval=None):
 
 def make_predictions(models, x, coefs=None):
     if not coefs:
-        coefs = [torch.ones(1) for m in models]
+        coefs = [torch.ones(1).to(device) for m in models]
     return torch.stack([model(x) * k for model, k in zip(models, coefs)]).sum(dim=0)
 
 def test(models, dataloader, coefs=None, loss_fn=nn.CrossEntropyLoss()):
@@ -29,7 +29,8 @@ def test(models, dataloader, coefs=None, loss_fn=nn.CrossEntropyLoss()):
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
     def helper():
-         for x, y in dataloader:
+        nonlocal test_loss, correct
+        for x, y in dataloader:
             x, y = x.to(device), y.to(device)
             pred = make_predictions(models, x, coefs)
             test_loss = test_loss + loss_fn(pred, y)

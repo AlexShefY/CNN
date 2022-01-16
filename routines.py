@@ -22,10 +22,11 @@ def make_predictions(models, x, see_orig=True, aug_iters=0):
     pred = sum(model(x) for model in models) if see_orig else torch.zeros_like(models[0](x))
     for iter_num in range(aug_iters):
         pred = pred + sum(model(autoaug(x)) for model in models)
-    return pred.argmax(dim=-1).cpu().numpy()
+    return pred
 
 def test(models, dataloader, see_orig=True, aug_iters=0, loss_fn=nn.CrossEntropyLoss()):
-    model.eval()
+    for model in models:
+        model.eval()
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
     with torch.no_grad():
@@ -42,13 +43,15 @@ def write_solution(filename, labels):
         for i, label in enumerate(labels):
             print(f'{i},{label}', file=solution)
 
-def solve_test(model, dataloader, name):
+def solve_test(models, dataloader, name):
+    for model in models:
+        model.eval()
     predictions = []
-    model.eval()
     with torch.no_grad():
         for x, _ in dataloader:
             pred = make_predictions(models=models, x=x.to(device), see_orig=True, aug_iters=0)
-            predictions.extend(list(pred))
+            predictions.extend(list(pred.argmax(dim=-1).cpu().numpy()))
     print(len(predictions), 'predictions')
+    torch.save(model, f'model_{name}.p')
     write_solution(f'solution_{name}.csv', predictions)
             

@@ -27,9 +27,8 @@ config = {
 }
 run['parameters'] = config
 print(f'run config is', *config.items(), flush=True)
-
-train_loader, val_loader, test_loader = build_dataloaders(batch_size=64)
-
+train_loader, val_loader, test_loader = build_dataloaders(batch_size=64, download=False)
+print()
 def train_model(model, optimizer, scheduler, epochs=10**9):
     pathx, pathy = [], []
     train_id = int(time())
@@ -49,17 +48,25 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
             run['train/val_loss'].log(loss, step=step)
             run['train/val_acc'].log(acc, step=step)
 
-        train_epoch(model, train_loader, optimizer, train_logging, 100)
+        train_epoch(model, train_loader, optimizer, train_logging, 25)
         scheduler.step()
         test_logging(*test([model], val_loader, True, 0))
-        solve_test(model, test_loader)
+        name = f'{train_id}_{epoch}'
+        solve_test([model], test_loader, name)
 
-model = models.resnet18().to(device)
-model.fc = nn.Linear(512, 10)
+# model = models.resnet18()
+# model.fc = nn.Linear(512, 10)
+model = nn.Sequential(
+    nn.Flatten(),
+    nn.Linear(3 * 32 * 32, 10)
+)
+
 for name, module in model.named_children():
     if name == 'fc':
         continue
     module = nn.Sequential(module, nn.Dropout(p=config['dropout']))
+model = model.to(device)
+
 optimizer = QHAdam(model.parameters(),
     lr=config['lr'],
     betas=(config['beta1'], config['beta2']),

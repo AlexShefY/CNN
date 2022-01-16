@@ -18,23 +18,27 @@ def train_epoch(model, dataloader, optimizer, logging=None, interval=None):
         if logging and (not interval or batch % interval == 0):
             logging(batch, loss.item(), *complex_hash(model, 2))
 
-def make_predictions(models, x, see_orig=True, aug_iters=0):
-    pred = sum(model(x) for model in models) if see_orig else torch.zeros_like(models[0](x))
-    for iter_num in range(aug_iters):
-        pred = pred + sum(model(autoaug(x)) for model in models)
-    return pred
+def make_predictions(models, x, coefs=None):
+    if not coefs:
+        coefs = [torch.ones(1) for m in models]
+    return torch.stack([model(x) * k for model, k in zip(models, coefs)]).sum(dim=0)
 
-def test(models, dataloader, see_orig=True, aug_iters=0, loss_fn=nn.CrossEntropyLoss()):
+def test(models, dataloader, coefs=None, loss_fn=nn.CrossEntropyLoss()):
     for model in models:
         model.eval()
     num_batches = len(dataloader)
     test_loss, correct = 0, 0
-    with torch.no_grad():
-        for x, y in dataloader:
+    def helper():
+         for x, y in dataloader:
             x, y = x.to(device), y.to(device)
-            pred = make_predictions(models, x)
-            test_loss += loss_fn(pred, y)
+            pred = make_predictions(models, x, coefs)
+            test_loss = test_loss + loss_fn(pred, y)
             correct += (pred.argmax(dim=-1) == y).to(torch.float).mean()
+    if not coefs:
+        with torch.no_grad():
+           helper()
+    else:
+        helper()
     return test_loss / num_batches, correct / num_batches
 
 def write_solution(filename, labels):
@@ -43,15 +47,13 @@ def write_solution(filename, labels):
         for i, label in enumerate(labels):
             print(f'{i},{label}', file=solution)
 
-def solve_test(models, dataloader, name, see_orig=True, aug_iters=0):
+def solve_test(models, dataloader, name, coefs=None):
     for model in models:
         model.eval()
     predictions = []
     with torch.no_grad():
         for x, _ in dataloader:
-            pred = make_predictions(models, x.to(device), see_orig, aug_iters)
+            pred = make_predictions(models, x.to(device), coefs)
             predictions.extend(list(pred.argmax(dim=-1).cpu().numpy()))
     print(len(predictions), 'predictions')
-    torch.save(model, f'model_{name}.p')
     write_solution(f'solution_{name}.csv', predictions)
-            

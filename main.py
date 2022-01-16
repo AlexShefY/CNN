@@ -20,15 +20,16 @@ config = {
     'dropout': 0.1,
     'beta1': 0.9,
     'beta2': 0.999,
-    'nu1': 1.0,
+    'nu1': 0.7,
     'nu2': 1.0,
     'epochs': 50,
     'gamma': 0.95
 }
 run['parameters'] = config
 print(f'run config is', *config.items(), flush=True)
+
 train_loader, val_loader, test_loader = build_dataloaders(batch_size=64, download=False)
-print()
+
 def train_model(model, optimizer, scheduler, epochs=10**9):
     pathx, pathy = [], []
     train_id = int(time())
@@ -52,14 +53,23 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
         scheduler.step()
         test_logging(*test([model], val_loader, True, 0))
         name = f'{train_id}_{epoch}'
-        solve_test([model], test_loader, name)
+        solve_test([model], test_loader, name, True, 0)
 
-# model = models.resnet18()
-# model.fc = nn.Linear(512, 10)
-model = nn.Sequential(
-    nn.Flatten(),
-    nn.Linear(3 * 32 * 32, 10)
-)
+model = models.resnet18()
+model.fc = nn.Linear(512, 10)
+for name, module in model.named_children():
+    if name == 'fc':
+        continue
+    module = nn.Sequential(module, nn.Dropout(p=config['dropout']))
+model = model.to(device)
+optimizer = QHAdam(model.parameters(),
+    lr=config['lr'],
+    betas=(config['beta1'], config['beta2']),
+    nus=(config['nu1'], config['nu2']),
+    weight_decay=config['wd'])
+scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=config['gamma'])
+train_model(model, optimizer, scheduler, config['epochs'])
+
 
 for name, module in model.named_children():
     if name == 'fc':

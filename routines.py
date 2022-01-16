@@ -43,13 +43,13 @@ def write_solution(filename, labels):
         for i, label in enumerate(labels):
             print(f'{i},{label}', file=solution)
 
-def solve_test(models, dataloader, name):
+def solve_test(models, dataloader, name, see_orig=True, aug_iters=0):
     for model in models:
         model.eval()
     predictions = []
     with torch.no_grad():
         for x, _ in dataloader:
-            pred = make_predictions(models=models, x=x.to(device), see_orig=True, aug_iters=0)
+            pred = make_predictions(models, x.to(device), see_orig, aug_iters)
             predictions.extend(list(pred.argmax(dim=-1).cpu().numpy()))
     print(len(predictions), 'predictions')
     torch.save(model, f'model_{name}.p')

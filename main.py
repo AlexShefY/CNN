@@ -53,6 +53,7 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
         scheduler.step()
         test_logging(*test([model], val_loader))
         name = f'{train_id}_{epoch}'
+        torch.save(model, f'model_{name}.p')
         solve_test([model], test_loader, name)
 
 model = models.resnet18()
@@ -64,21 +65,6 @@ for name, module in model.named_children():
         continue
     module = nn.Sequential(module, nn.Dropout(p=config['dropout']))
 model = model.to(device)
-optimizer = QHAdam(model.parameters(),
-    lr=config['lr'],
-    betas=(config['beta1'], config['beta2']),
-    nus=(config['nu1'], config['nu2']),
-    weight_decay=config['wd'])
-scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=config['gamma'])
-train_model(model, optimizer, scheduler, config['epochs'])
-
-
-for name, module in model.named_children():
-    if name == 'fc':
-        continue
-    module = nn.Sequential(module, nn.Dropout(p=config['dropout']))
-model = model.to(device)
-
 optimizer = QHAdam(model.parameters(),
     lr=config['lr'],
     betas=(config['beta1'], config['beta2']),

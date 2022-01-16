@@ -15,7 +15,7 @@ from routines import train_epoch, test, solve_test
 # def solve_test(model, dataloader, name)
 
 config = {
-    'lr': 0.01,
+    'lr': 0.002,
     'wd': 1e-6,
     'dropout': 0.1,
     'beta1': 0.9,
@@ -23,7 +23,7 @@ config = {
     'nu1': 0.7,
     'nu2': 1.0,
     'epochs': 50,
-    'gamma': 0.95
+    'gamma': 0.9
 }
 run['parameters'] = config
 print(f'run config is', *config.items(), flush=True)

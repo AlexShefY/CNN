@@ -20,10 +20,11 @@ run = neptune.init(project=project, api_token=token)
 project = neptune.init_project(name=project, api_token=token)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-def build_dataloaders(batch_size):
-    # project['train_v1.bin'].download()
-    # project['test_v1.bin'].download()
-    # project['val_v1.bin'].download()
+def build_dataloaders(batch_size, download=True):
+    if download:
+        project['train_v1.bin'].download()
+        project['test_v1.bin'].download()
+        project['val_v1.bin'].download()
 
     with open('train_v1.bin.bin', 'rb') as f:
         train_data = pickle.load(f)

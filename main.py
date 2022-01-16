@@ -51,12 +51,14 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
 
         train_epoch(model, train_loader, optimizer, train_logging, 25)
         scheduler.step()
-        test_logging(*test([model], val_loader, True, 0))
+        test_logging(*test([model], val_loader))
         name = f'{train_id}_{epoch}'
-        solve_test([model], test_loader, name, True, 0)
+        solve_test([model], test_loader, name)
 
 model = models.resnet18()
 model.fc = nn.Linear(512, 10)
+# model = nn.Sequential(nn.Flatten(), nn.Linear(3 * 32 * 32, 10))
+
 for name, module in model.named_children():
     if name == 'fc':
         continue

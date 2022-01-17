@@ -9,9 +9,7 @@ from torch import nn
 from qhoptim.pyt import QHM, QHAdam
 from data import run, device, build_dataloaders
 from routines import train_epoch, test, solve_test
-from models.modelM3 import ModelM3
-from models.modelM5 import ModelM5
-from models.modelM7 import ModelM7
+from models import *
 # def train_epoch(model, dataloader, optimizer, logging=None, interval=None)
 # def test(models, dataloader, see_orig=True, aug_iters=0, loss_fn=nn.CrossEntropyLoss())
 # def solve_test(model, dataloader, name)

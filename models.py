@@ -17,7 +17,7 @@ import torch.nn.functional as F
 
 class M3(nn.Module):
     def __init__(self):
-        super(ModelM3, self).__init__()
+        super(M3, self).__init__()
         self.conv1 = nn.Conv2d(3, 32, 3, bias=False)       # output becomes 26x26
         self.conv1_bn = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 48, 3, bias=False)      # output becomes 24x24
@@ -61,7 +61,7 @@ class M3(nn.Module):
 
 class M5(nn.Module):
     def __init__(self):
-        super(ModelM5, self).__init__()
+        super(M5, self).__init__()
         self.conv1 = nn.Conv2d(1, 32, 5, bias=False)
         self.conv1_bn = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 64, 5, bias=False)
@@ -90,7 +90,7 @@ class M5(nn.Module):
 
 class M7(nn.Module):
     def __init__(self):
-        super(ModelM7, self).__init__()
+        super(M7, self).__init__()
         self.conv1 = nn.Conv2d(1, 48, 7, bias=False)    # output becomes 22x22
         self.conv1_bn = nn.BatchNorm2d(48)
         self.conv2 = nn.Conv2d(48, 96, 7, bias=False)   # output becomes 16x16

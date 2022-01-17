@@ -15,9 +15,7 @@ class Plug:
         pass
 
 project = 'mlxa/CNN'
-token = input('neptune token:') 
-if len(token) < 10:
-    token = 'eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NTIzY2UxZC1jMjI5LTRlYTQtYjQ0Yi1kM2JhMGU1NDllYTIifQ=='
+token = token = 'eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NTIzY2UxZC1jMjI5LTRlYTQtYjQ0Yi1kM2JhMGU1NDllYTIifQ=='
 run = neptune.init(project=project, api_token=token)
 project = neptune.init_project(name=project, api_token=token)
 device = 'cuda' if torch.cuda.is_available() else 'cpu'

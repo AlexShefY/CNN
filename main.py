@@ -1,5 +1,4 @@
-# pip install neptune-client qhoptim
-
+#!pip install neptune-client qhoptim
 from time import time
 import torch
 from torchvision import models
@@ -10,10 +9,12 @@ from torch import nn
 from qhoptim.pyt import QHM, QHAdam
 from data import run, device, build_dataloaders
 from routines import train_epoch, test, solve_test
+from models.modelM3 import ModelM3
+from models.modelM5 import ModelM5
+from models.modelM7 import ModelM7
 # def train_epoch(model, dataloader, optimizer, logging=None, interval=None)
 # def test(models, dataloader, see_orig=True, aug_iters=0, loss_fn=nn.CrossEntropyLoss())
 # def solve_test(model, dataloader, name)
-from git_utils import save_to_zoo, load_from_zoo
 
 config = {
     'lr': 0.002,
@@ -26,7 +27,6 @@ config = {
     'epochs': 50,
     'gamma': 0.9
 }
-config = dict()
 run['parameters'] = config
 print(f'run config is', *config.items(), flush=True)
 
@@ -58,30 +58,20 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
         torch.save(model, f'model_{name}.p')
         solve_test(model, test_loader, name)
 
-model = models.resnet18()
-model.fc = nn.Linear(512, 10)
+# model = models.resnet18()
+# model.fc = nn.Linear(512, 10)
 # model = nn.Sequential(nn.Flatten(), nn.Linear(3 * 32 * 32, 10))
-
-# for name, module in model.named_children():
-#     if name == 'fc':
-#         continue
-#     module = nn.Sequential(module, nn.Dropout(p=config['dropout']))
-# model = model.to(device)
-# optimizer = QHAdam(model.parameters(),
-#     lr=config['lr'],
-#     betas=(config['beta1'], config['beta2']),
-#     nus=(config['nu1'], config['nu2']),
-#     weight_decay=config['wd'])
-# scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=config['gamma'])
-# train_model(model, optimizer, scheduler, config['epochs'])
-
-from os import listdir
-from torchvision.models import resnet18
-from models import *
-
-lst = [e for e in listdir('zoo') if '.p' in e]
-print(lst)
-
-for name in lst:
-    model = load_from_zoo(name[:-2])
-    print(model)
+model = M3().to(device)
+#for name, module in model.named_children():
+#    if name == 'fc':
+#        continue
+#    module = nn.Sequential(module, nn.Dropout(p=config['dropout']))
+#model = model.to(device)
+print(model)
+optimizer = QHAdam(model.parameters(),
+    lr=config['lr'],
+    betas=(config['beta1'], config['beta2']),
+    nus=(config['nu1'], config['nu2']),
+    weight_decay=config['wd'])
+scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=config['gamma'])
+train_model(model, optimizer, scheduler, config['epochs'])

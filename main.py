@@ -15,12 +15,12 @@ import static as st
 
 def init(smoke=False, config=dict()):
     st.device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    st.train_loader = build_dataloader('train_v2.bin', batch_size=8, shuffle=True)
-    st.val_loader = build_dataloader('val_v2.bin', batch_size=64, shuffle=True)
-    st.test_loader = None if smoke else build_dataloader('test_v2.bin', batch_size=64, shuffle=True)
     st.project = neptune.init_project(name='mlxa/CNN', api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NTIzY2UxZC1jMjI5LTRlYTQtYjQ0Yi1kM2JhMGU1NDllYTIifQ==')
-    st.run = Plug() if smoke else neptune.init(project=project_name, api_token=token)
+    st.run = Plug() if smoke else neptune.init(project=st.project_name, api_token=st.token)
     st.run['parameters'] = config
+    st.train_loader = build_dataloader('train_v2.bin' if smoke else 'train_v1.bin', batch_size=8, shuffle=True)
+    st.val_loader = build_dataloader('val_v2.bin' if smoke else 'val_v2.bin', batch_size=64, shuffle=True)
+    st.test_loader = None if smoke else build_dataloader('test_v2.bin', batch_size=64, shuffle=True)
     print(f'run config is', *config.items(), flush=True)
 
 config = {
@@ -35,9 +35,9 @@ config = {
     'gamma': 0.9
 }
 
-init(smoke=True, config=config)
+init(smoke=False, config=config)
 
-model = M7().to(st.device)
+model = M7S1().to(st.device)
 print(model)
 
 optimizer = QHAdam(model.parameters(),

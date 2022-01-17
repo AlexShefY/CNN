@@ -7,12 +7,12 @@ from data import Plug
 import torch  
 import static as st
 from time import time  
-from tqdm import trange
+from tqdm import trange, tqdm
 
 def train_epoch(model, dataloader, optimizer, logging=None, interval=None):
     model.train()
     loss_fn = nn.CrossEntropyLoss()
-    for batch, (x, y) in enumerate(dataloader):
+    for batch, (x, y) in tqdm(enumerate(dataloader)):
         x, y = x.to(st.device), y.to(st.device)
         loss = loss_fn(model(autoaug(x)), y)
         optimizer.zero_grad()
@@ -59,7 +59,7 @@ def train_model(model, optimizer, scheduler, epochs=10**9, predicate=lambda loss
     train_id = st.run.split('/')[-1] if type(st.run) is not Plug else int(time())
     print(f'started train #{train_id}', flush=True)
 
-    for epoch in trange(epochs):
+    for epoch in range(epochs):
         def train_logging(batch, loss, hx, hy):
             pathx.append(hx)
             pathy.append(hy)

@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader
 from os import listdir, system
 import static as st
 
+
 class Plug:
     d = dict()
     def log(self, x, step=None):
@@ -15,12 +16,18 @@ class Plug:
         self.d[s] = v
 
 def build_dataloader(name, batch_size, shuffle):
+    import pickle
     if not name in listdir():
         st.project[name].download()
         assert f'{name}.bin' in listdir()
         system(f'mv {name}.bin {name}')
         system(f'move {name}.bin {name}')
-    data = torch.load(name)
+    try:
+        data = torch.load(name)
+    except Exception as e:
+        print("torch.load() didn't work")
+        with open(name) as f:
+            data = pickle.load(f)
     return DataLoader(data, batch_size=batch_size, shuffle=shuffle)
 
 def smooth(pic):

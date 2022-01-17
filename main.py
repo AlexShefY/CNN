@@ -42,7 +42,7 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
             step = epoch + (batch + 1) / len(train_loader)
             run['train/epoch'].log(step, step=step)
             run['train/train_loss'].log(loss, step=step)
-            run['train/path'] = File.as_html(px.line(x=pathx, y=pathy, markers=True))
+            run['train/path'] = File.as_html(px.line(x=pathx, y=pathy))
         def test_logging(loss, acc):
             step = epoch + 1
             run['train/epoch'].log(step, step=step)

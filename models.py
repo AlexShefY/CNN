@@ -1,15 +1,18 @@
-from torch import nn
 import torch
+from torch import nn
 import torch.nn.functional as F
+from torchvision import transforms
 
 class Resnet18(nn.Module):
-	def __init__(self, fc_size):
-		from torchvision.models import resnet18
-		super(Resnet18, self).__init__()
-		self.resnet = resnet18()
-		self.resnet.fc = nn.Linear(512, fc_size)
-	def forward(self, x):
-		return self.resnet(x)
+    def __init__(self, fc_size):
+        from torchvision.models import resnet18
+        super(Resnet18, self).__init__()
+        self.resnet = resnet18()
+        self.resnet.fc = nn.Linear(512, fc_size)
+    def forward(self, x):
+        return self.resnet(x)
+    def loader():
+        return f'Resnet18({self.resnet.fc.out_features})'
 
 import torch
 import torch.nn as nn
@@ -58,11 +61,13 @@ class M3(nn.Module):
     def forward(self, x):
         logits = self.get_logits(x)
         return F.log_softmax(logits, dim=1)
+    def loader(self):
+        return 'M3()'
 
 class M5(nn.Module):
     def __init__(self):
         super(M5, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, 5, bias=False)
+        self.conv1 = nn.Conv2d(3, 32, 5, bias=False)
         self.conv1_bn = nn.BatchNorm2d(32)
         self.conv2 = nn.Conv2d(32, 64, 5, bias=False)
         self.conv2_bn = nn.BatchNorm2d(64)
@@ -87,11 +92,14 @@ class M5(nn.Module):
     def forward(self, x):
         logits = self.get_logits(x)
         return F.log_softmax(logits, dim=1)
+    def loader(self):
+        return 'M3()'
 
 class M7(nn.Module):
     def __init__(self):
         super(M7, self).__init__()
-        self.conv1 = nn.Conv2d(1, 48, 7, bias=False)    # output becomes 22x22
+        self.crop = transforms.CenterCrop(28)
+        self.conv1 = nn.Conv2d(3, 48, 7, bias=False)    # output becomes 22x22
         self.conv1_bn = nn.BatchNorm2d(48)
         self.conv2 = nn.Conv2d(48, 96, 7, bias=False)   # output becomes 16x16
         self.conv2_bn = nn.BatchNorm2d(96)
@@ -103,7 +111,7 @@ class M7(nn.Module):
         self.fc1_bn = nn.BatchNorm1d(10)
     def get_logits(self, x):
         x = (x - 0.5) * 2.0
-        conv1 = F.relu(self.conv1_bn(self.conv1(x)))
+        conv1 = F.relu(self.conv1_bn(self.conv1(self.crop(x))))
         conv2 = F.relu(self.conv2_bn(self.conv2(conv1)))
         conv3 = F.relu(self.conv3_bn(self.conv3(conv2)))
         conv4 = F.relu(self.conv4_bn(self.conv4(conv3)))
@@ -113,4 +121,5 @@ class M7(nn.Module):
     def forward(self, x):
         logits = self.get_logits(x)
         return F.log_softmax(logits, dim=1)
-
+    def loader(self):
+        return 'M7()'

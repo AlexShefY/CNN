@@ -68,10 +68,9 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
             st.run['train/val_loss'].log(loss, step=step)
             st.run['train/val_acc'].log(acc, step=step)
             print(f'step: {step}, loss: {loss}, acc: {acc}, hx: {pathx[-1] or None}, hy: {pathy[-1] or None}')
-            if predicate(loss, acc):
-                name = f'{train_id}_{epoch}'
-                save_to_zoo(model, name, val_loss, val_acc)
-                solve_test(model, st.test_loader, f'solution_{model.loader()}_{name}')
+            name = f'{train_id}_{epoch}'
+            save_to_zoo(model, name, val_loss, val_acc)
+            solve_test(model, st.test_loader, f'solution_{model.loader()}_{name}')
         train_epoch(model, st.train_loader, optimizer, train_logging, 25)
         scheduler.step()
         with torch.no_grad():

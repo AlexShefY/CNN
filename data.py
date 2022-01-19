@@ -27,7 +27,7 @@ def build_dataloader(name, batch_size, shuffle):
     try:
         data = torch.load(name)
     except Exception as e:
-        print("torch.load() didn't work")
+        print("torch.load() didn't work, trying pickle")
         with open(name, 'rb') as f:
             data = pickle.load(f)
     return DataLoader(data, batch_size=batch_size, shuffle=shuffle)
@@ -44,6 +44,7 @@ def smooth(pic):
     return torch.where(b, pic, s/4)
 
 from models import *
+from git_utils import load_from_zoo
 def build_model(config):
     model = eval(config['model'])
     return model.to(config['device'])

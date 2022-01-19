@@ -26,7 +26,7 @@ def test(model, dataloader, loss_fn=nn.CrossEntropyLoss()):
         pred = model(x)
         test_loss = test_loss + loss_fn(pred, y)
         correct += (pred.argmax(dim=-1) == y).to(torch.float).mean()
-    return test_loss / num_batches, correct / num_batches
+    return (test_loss / num_batches).item(), (correct / num_batches).item()
 
 def write_solution(filename, labels):
     with open(filename, 'w') as solution:
@@ -74,7 +74,8 @@ def train_model(model, optimizer, scheduler, epochs=10**9):
                 solve_test(model, st.test_loader, f'solution_{model.loader()}_{name}')
         train_epoch(model, st.train_loader, optimizer, train_logging, 25)
         scheduler.step()
-        test_logging(*test(model, st.val_loader))
+        with torch.no_grad():
+            test_logging(*test(model, st.val_loader))
 
 import neptune.new as neptune
 from data import Plug, build_dataloader, build_model, build_optimizer, build_lr_scheduler

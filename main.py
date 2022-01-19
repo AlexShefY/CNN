@@ -35,7 +35,7 @@ config = {
     'gamma': 0.9
 }
 
-init(smoke=True, config=config)
+init(smoke=False, config=config)
 
 model = M7S1().to(st.device)
 print(model)
@@ -48,5 +48,4 @@ optimizer = QHAdam(model.parameters(),
 
 scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer=optimizer, gamma=config['gamma'])
 
-with torch.autograd.profiler.profile() as prof:
-    train_model(model, optimizer, scheduler, config['epochs'])
+train_model(model, optimizer, scheduler, config['epochs'])

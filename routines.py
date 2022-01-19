@@ -57,7 +57,7 @@ def train_model(model, optimizer, scheduler, epochs=10**9, predicate=lambda loss
     global run, train_loader, val_loader, test_loader
 
     pathx, pathy = [], []
-    train_id = st.run.split('/')[-1] if type(st.run) is not Plug else int(time())
+    train_id = str(st.run).split('/')[-1] if type(st.run) is not Plug else int(time())
     print(f'started train #{train_id}', flush=True)
 
     for epoch in trange(epochs):

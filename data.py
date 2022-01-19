@@ -26,7 +26,7 @@ def build_dataloader(name, batch_size, shuffle):
         data = torch.load(name)
     except Exception as e:
         print("torch.load() didn't work")
-        with open(name) as f:
+        with open(name, 'rb') as f:
             data = pickle.load(f)
     return DataLoader(data, batch_size=batch_size, shuffle=shuffle)
 

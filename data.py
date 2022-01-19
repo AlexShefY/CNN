@@ -67,6 +67,6 @@ def build_lr_scheduler(optimizer, config):
     elif tp is 'ExponentialLR':
         return torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=config['gamma'])
     elif tp is 'OneCycleLR':
-        return torch.optim.lr_scheduler.ExponentialLR(optimizer, max_lr=config['max_lr'], total_steps=config['epochs']*len(st.train_loader), cycle_momentum=False)
+        return torch.optim.lr_scheduler.OneCycleLR(optimizer, config['max_lr'], total_steps=config['epochs']*len(st.train_loader), cycle_momentum=False)
     else:
         assert False, 'Unknown LR scheduler'

@@ -84,7 +84,7 @@ def run(config):
     [print(f'{key}: {value}') for key, value in config.items()]
     st.device = config['device']
     st.project = neptune.init_project(name='mlxa/CNN', api_token='eyJhcGlfYWRkcmVzcyI6Imh0dHBzOi8vYXBwLm5lcHR1bmUuYWkiLCJhcGlfdXJsIjoiaHR0cHM6Ly9hcHAubmVwdHVuZS5haSIsImFwaV9rZXkiOiI5NTIzY2UxZC1jMjI5LTRlYTQtYjQ0Yi1kM2JhMGU1NDllYTIifQ==')
-    st.run = Plug() if config['register_run'] else neptune.init(project=config['project_name'], api_token=config['api_token'])
+    st.run = neptune.init(project=config['project_name'], api_token=config['api_token']) if config['register_run'] else Plug()
     st.run_id = st.run.get_run_url().split('/')[-1] if type(st.run) is not Plug else int(time())
     st.run['parameters'] = config
     st.train_loader = build_dataloader(config['train'], batch_size=config['batch_size'], shuffle=True)

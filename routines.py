@@ -49,7 +49,7 @@ def solve_test(model, dataloader, name):
 from neptune.new.types import File
 import plotly.express as px
 from git_utils import save_to_zoo
-def train_model(model, optimizer, scheduler, epochs=10**9, predicate=lambda loss, acc: acc > 93):
+def train_model(model, optimizer, scheduler, epochs=10**9):
     global run, train_loader, val_loader, test_loader
 
     pathx, pathy = [], []
@@ -71,8 +71,7 @@ def train_model(model, optimizer, scheduler, epochs=10**9, predicate=lambda loss
             if predicate(loss, acc):
                 name = f'{train_id}_{epoch}'
                 save_to_zoo(model, name, val_loss, val_acc)
-                if st.test_loader is not None:
-                    solve_test(model, st.test_loader, f'solution_{model.loader()}_{name}')
+                solve_test(model, st.test_loader, f'solution_{model.loader()}_{name}')
         train_epoch(model, st.train_loader, optimizer, train_logging, 25)
         scheduler.step()
         test_logging(*test(model, st.val_loader))

@@ -24,9 +24,8 @@ config = {
     'nu2': 1.0,
     'epochs': 5,
 
-    'lr_scheduler': 'ExponentialLR',
-    'gamma': 0.9,
+    'lr_scheduler': 'OneCycleLR',
+    'max_lr': 1
 }
 
 run(config)
-
